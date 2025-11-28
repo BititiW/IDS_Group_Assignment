@@ -9,7 +9,7 @@ library(english)
 
 ### Essential Stringr Functions
 str_replace(string = "5ft8", pattern = "ft", replacement = "'")
-
+#hi guys 
 str_replace_all(string = "between 5ft8 and 5ft10", pattern = "ft", replacement = "'")
 
 str_detect(string = "5'11", pattern = "^[4-7]'[0-9]{1,2}$") # it would be false if there were at least one condition was not met
