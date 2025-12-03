@@ -1,50 +1,39 @@
 library(dplyr)
 library(ggplot2)
-library(tidyverse)
 library(ggthemes)
-#library packages needed
 
+# Read and join data
 data <- read.csv("youth-not-in-education-employment-training.csv")
 country <- read.csv("continents-according-to-our-world-in-data.csv")
+data1 <- data %>% left_join(country, join_by(Code))
+data1 <- data1 %>% select(-Entity.y, -Year.y)
 
-data1 <- data %>% left_join(country,join_by(Code))
-#join two datasets together
-data1 <- data1 %>% select(-Entity.y,-Year.y)
-#remove extra columns
+# Calculate average proportion by continent and year
+data2 <- data1 %>%
+  group_by(Continent, Year.x) %>%
+  summarise(avg = mean(Share.of.youth.not.in.education..employment.or.training..total....of.youth.population., na.rm = TRUE),.groups = "drop") %>%
+  filter(Continent %in% c("Africa", "Asia", "Europe", "North America", "Oceania", "South America"),
+         Year.x >= 2015, Year.x <= 2020)
 
-data2 <- data1 %>% group_by(Continent,Year.x) %>%
-  summarise(avg = mean(Share.of.youth.not.in.education..employment.or.training..total....of.youth.population., na.rm = TRUE))
-#calculating average proportion of 6 continents
-
-africa <- data2 %>% filter(Continent == "Africa", Year.x >= 2015, Year.x <= 2020)
-asia <- data2 %>% filter(Continent == "Asia",Year.x >= 2015, Year.x <= 2020)
-europe <- data2 %>% filter(Continent == "Europe",Year.x >= 2015, Year.x <= 2020)
-nm <- data2 %>% filter(Continent == "North America",Year.x >= 2015, Year.x <= 2020)
-oceania <- data2 %>% filter(Continent == "Oceania",Year.x >= 2015, Year.x <= 2020)
-sm <- data2 %>% filter(Continent == "South America",Year.x >= 2015, Year.x <= 2020)
-#seperating the dataset by different continents
-
-ggafrica <- africa %>% ggplot(aes(x=Year.x, y=avg)) + geom_point(color="brown",size=1) + geom_line(color="brown",lwd=1) + labs(title = "The proportion of youth not in employment, education or
-training in Africa", y = "Proportion(in %)",x = "Year") + theme_economist()
-print(ggafrica)
-
-ggasia <- asia %>% ggplot(aes(x=Year.x, y=avg)) + geom_point(color="red2",size=1) + geom_line(color="red2",lwd=1) + labs(title = "The proportion of youth not in employment, education or
-training in Asia", y = "Proportion(in %)",x = "Year") + theme_economist()
-print(ggasia)
-
-ggeurope <- europe %>% ggplot(aes(x=Year.x, y=avg)) + geom_point(color="orange2",size=1) + geom_line(color="orange2",lwd=1) + labs(title = "The proportion of youth not in employment, education or
-training in Europe", y = "Proportion(in %)",x = "Year") + theme_economist()
-print(ggeurope)
-
-ggnm <- nm %>% ggplot(aes(x=Year.x, y=avg)) + geom_point(color="darkblue",size=1) + geom_line(color="darkblue",lwd=1) + labs(title = "The proportion of youth not in employment, education or
-training in North America", y = "Proportion(in %)",x = "Year") + theme_economist()
-print(ggnm)
-
-ggoceania <- oceania %>% ggplot(aes(x=Year.x, y=avg)) + geom_point(color="darkgreen",size=1) + geom_line(color="darkgreen",lwd=1) + labs(title = "The proportion of youth not in employment, education or
-training in Oceania", y = "Proportion(in %)",x = "Year") + theme_economist()
-print(ggoceania)
-
-ggsm <- africa %>% ggplot(aes(x=Year.x, y=avg)) + geom_point(color="purple3",size=1) + geom_line(color="purple3",lwd=1) + labs(title = "The proportion of youth not in employment, education or
-training in South America", y = "Proportion(in %)",x = "Year") + theme_economist()
-print(ggsm)
-#plotting and printing graphs
+# Plot all continents together
+ggplot(data2, aes(x = Year.x, y = avg, color = Continent)) +
+  geom_point(size = 2, alpha = 0.8) +
+  geom_line(size = 1) +
+  scale_color_brewer(palette = "Dark2") +
+  labs(
+    title = "Youth Not in Employment, Education, or Training (NEET) by Continent (2015-2020)",
+    subtitle = "Average proportion of youth (in %) by continent, 2015-2020",
+    x = "Year",
+    y = "Proportion of NEET Youth (%)",
+    color = "Continent"
+  ) +
+  scale_x_continuous(breaks = seq(2015, 2020, 1)) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", size = 18, hjust = 0.5),
+    plot.subtitle = element_text(size = 14, hjust = 0.5),
+    axis.title = element_text(face = "bold"),
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "grey85")
+  )
