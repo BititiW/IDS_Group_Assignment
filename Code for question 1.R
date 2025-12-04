@@ -82,8 +82,7 @@ Low_income_growth_rates <- joined_data2_Low_Income %>%
 # Calculate average growth for all years for each country
 Avg_Growth <- Low_income_growth_rates %>%
   group_by(Country) %>%
-  summarise(Avg_Growth = mean(GDP_Growth_Rate, na.rm = TRUE)) %>%
-  print(n = 50)
+  summarise(Avg_Growth = mean(GDP_Growth_Rate, na.rm = TRUE))
 
 # Join average growth data set to original data set (of low income countries only)
 Low_income_growth_rates <- Low_income_growth_rates %>%
@@ -140,3 +139,260 @@ Countries_meeting_target <- data.frame(Continent = c("Africa", "Asia", "North Am
                                                                  Countries_meeting_target_North_America,
                                                                  Countries_meeting_target_Oceania)
                                        )
+
+
+
+
+
+
+
+# -----------------------------------------------------------------------------
+
+### Low
+Avg_Growth_Low <- mean(Only_Avg_Growth$Avg_Growth)
+
+## Calculate average growth of all L countries by Continent
+Avg_Growth_All_L_by_Continent <- Only_Avg_Growth %>%
+  group_by(Continent) %>%
+  summarise(Avg_Growth_All_L_by_Continent = mean(Avg_Growth))
+
+
+
+
+### LM
+
+# Keep only low middle income countries
+joined_data2_LM <- joined_data2 %>%
+  filter(`Income Classification` == "LM")
+
+# Calculate GDP growth for each low middle income country
+joined_data2_Growth_Rates_LM <- joined_data2 %>%
+  filter(`Income Classification` == "LM") %>%
+  group_by(Country) %>%
+  summarise(
+    GDP_Growth = (`GDP per capita` - lag(`GDP per capita`))*100/lag(`GDP per capita`)
+  )
+
+# Add growth rate column to original data set
+LM_growth_rates <- joined_data2_LM %>%
+  mutate(GDP_Growth_Rate = joined_data2_Growth_Rates_LM$GDP_Growth)
+
+# Calculate average growth for all years for each LM country
+Avg_Growth_LM <- LM_growth_rates %>%
+  group_by(Country) %>%
+  summarise(Avg_Growth_LM = mean(GDP_Growth_Rate, na.rm = TRUE))
+
+# Join average growth data set to original data set (of LM countries only)
+LM_growth_rates <- LM_growth_rates %>%
+  full_join(Avg_Growth_LM,
+            join_by(Country))
+
+# Remove columns of GDP per capita and GDP growth for individual years
+Only_Avg_Growth_LM <- LM_growth_rates %>%
+  select(Code, Country, Continent, `Income Classification`, Avg_Growth_LM) %>%
+  filter(Country != "Belarus") %>%
+  distinct()
+
+# Calculate average growth of all LM countries
+Avg_Growth_All_LM <- mean(Only_Avg_Growth_LM$Avg_Growth_LM)
+
+
+
+
+## Calculate average growth of all LM countries by Continent
+Avg_Growth_All_LM_by_Continent <- Only_Avg_Growth_LM %>%
+  group_by(Continent) %>%
+  summarise(Avg_Growth_All_LM_by_Continent = mean(Avg_Growth_LM))
+
+
+
+
+
+### UM
+
+# Keep only upper middle income countries
+joined_data2_UM <- joined_data2 %>%
+  filter(`Income Classification` == "UM")
+
+# Calculate GDP growth for each upper middle income country
+joined_data2_Growth_Rates_UM <- joined_data2 %>%
+  filter(`Income Classification` == "UM") %>%
+  group_by(Country) %>%
+  summarise(
+    GDP_Growth = (`GDP per capita` - lag(`GDP per capita`))*100/lag(`GDP per capita`)
+  )
+
+# Add growth rate column to original data set
+UM_growth_rates <- joined_data2_UM %>%
+  mutate(GDP_Growth_Rate = joined_data2_Growth_Rates_UM$GDP_Growth)
+
+# Calculate average growth for all years for each UM country
+Avg_Growth_UM <- UM_growth_rates %>%
+  group_by(Country) %>%
+  summarise(Avg_Growth_UM = mean(GDP_Growth_Rate, na.rm = TRUE))
+
+# Join average growth data set to original data set (of UM countries only)
+UM_growth_rates <- UM_growth_rates %>%
+  full_join(Avg_Growth_UM,
+            join_by(Country))
+
+# Remove columns of GDP per capita and GDP growth for individual years
+Only_Avg_Growth_UM <- UM_growth_rates %>%
+  select(Code, Country, Continent, `Income Classification`, Avg_Growth_UM) %>%
+  filter(Country != "Indonesia" & Country != "Mongolia" & Country != "Oman") %>%
+  distinct()
+
+# Calculate average growth of all UM countries
+Avg_Growth_All_UM <- mean(Only_Avg_Growth_UM$Avg_Growth_UM)
+
+
+## Calculate average growth of all UM countries by Continent
+Avg_Growth_All_UM_by_Continent <- Only_Avg_Growth_UM %>%
+  group_by(Continent) %>%
+  summarise(Avg_Growth_All_UM_by_Continent = mean(Avg_Growth_UM))
+
+
+### High
+
+# Keep only high income countries
+joined_data2_H <- joined_data2 %>%
+  filter(`Income Classification` == "H")
+
+# Calculate GDP growth for each high income country
+joined_data2_Growth_Rates_H <- joined_data2 %>%
+  filter(`Income Classification` == "H") %>%
+  group_by(Country) %>%
+  summarise(
+    GDP_Growth = (`GDP per capita` - lag(`GDP per capita`))*100/lag(`GDP per capita`)
+  )
+
+# Add growth rate column to original data set
+H_growth_rates <- joined_data2_H %>%
+  mutate(GDP_Growth_Rate = joined_data2_Growth_Rates_H$GDP_Growth)
+
+# Calculate average growth for all years for each H country
+Avg_Growth_H <- H_growth_rates %>%
+  group_by(Country) %>%
+  summarise(Avg_Growth_H = mean(GDP_Growth_Rate, na.rm = TRUE))
+
+# Join average growth data set to original data set (of H countries only)
+H_growth_rates <- H_growth_rates %>%
+  full_join(Avg_Growth_H,
+            join_by(Country))
+
+# Remove columns of GDP per capita and GDP growth for individual years
+Only_Avg_Growth_H <- H_growth_rates %>%
+  select(Code, Country, Continent, `Income Classification`, Avg_Growth_H) %>%
+  distinct()
+
+# Calculate average growth of all UM countries
+Avg_Growth_All_H <- mean(Only_Avg_Growth_H$Avg_Growth_H)
+
+
+
+## Calculate average growth of all H countries by Continent
+Avg_Growth_All_H_by_Continent <- Only_Avg_Growth_H %>%
+  group_by(Continent) %>%
+  summarise(Avg_Growth_All_H_by_Continent = mean(Avg_Growth_H))
+
+
+
+
+# ----------------------------------------------------------------------------
+
+### Bar Charts
+
+## Low Income countries
+
+Avg_Growth_All_L_by_Continent <- Avg_Growth_All_L_by_Continent %>%
+  add_row(Continent = "World", Avg_Growth_All_L_by_Continent = Avg_Growth_Low) %>%
+  arrange(Avg_Growth_All_L_by_Continent)
+
+ggplot(Avg_Growth_All_L_by_Continent, 
+       aes(x = reorder(Continent, Avg_Growth_All_L_by_Continent), 
+           y = Avg_Growth_All_L_by_Continent, 
+           fill = Continent)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("North America" = "red",
+                               "Africa" = "red",
+                               "Oceania" = "red",
+                               "World" = "navy",
+                               "Asia" = "green")) +
+  labs(title = "Average Growth of Low Income Countries by Continent",
+       x = "Continent",
+       y = "Average GDP per capita Growth")
+
+
+
+## Low Middle Income Countries
+
+Avg_Growth_All_LM_by_Continent <- Avg_Growth_All_LM_by_Continent %>%
+  add_row(Continent = "World", Avg_Growth_All_LM_by_Continent = Avg_Growth_All_LM) %>%
+  arrange(Avg_Growth_All_LM_by_Continent)
+
+ggplot(Avg_Growth_All_LM_by_Continent, 
+       aes(x = reorder(Continent, Avg_Growth_All_LM_by_Continent), 
+           y = Avg_Growth_All_LM_by_Continent,
+           fill = Continent)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("North America" = "red",
+                               "Africa" = "red",
+                               "Oceania" = "red",
+                               "World" = "navy",
+                               "South America" = "green",
+                               "Asia" = "green",
+                               "Europe" = "green")) +
+  labs(title = "Average Growth of Low Middle Income Countries by Continent",
+       x = "Continent",
+       y = "Average GDP per capita Growth")
+
+
+
+## Upper Middle Income countries
+
+Avg_Growth_All_UM_by_Continent <- Avg_Growth_All_UM_by_Continent %>%
+  add_row(Continent = "World", Avg_Growth_All_UM_by_Continent = Avg_Growth_All_UM) %>%
+  arrange(Avg_Growth_All_UM_by_Continent)
+
+ggplot(Avg_Growth_All_UM_by_Continent, 
+       aes(x = reorder(Continent, Avg_Growth_All_UM_by_Continent), 
+           y = Avg_Growth_All_UM_by_Continent,
+           fill = Continent)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("North America" = "red",
+                               "Africa" = "red",
+                               "Oceania" = "red",
+                               "World" = "navy",
+                               "South America" = "green",
+                               "Asia" = "green",
+                               "Europe" = "green")) +
+  labs(title = "Average Growth of Upper Middle Income Countries by Continent",
+       x = "Continent",
+       y = "Average GDP per capita Growth")
+
+
+
+## High income countries
+
+Avg_Growth_All_H_by_Continent <- Avg_Growth_All_H_by_Continent %>%
+  add_row(Continent = "World", Avg_Growth_All_H_by_Continent = Avg_Growth_All_H) %>%
+  arrange(Avg_Growth_All_H_by_Continent)
+
+ggplot(Avg_Growth_All_H_by_Continent, 
+       aes(x = reorder(Continent, Avg_Growth_All_H_by_Continent), 
+           y = Avg_Growth_All_H_by_Continent,
+           fill = Continent)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("North America" = "red",
+                               "World" = "navy",
+                               "Africa" = "green",
+                               "Oceania" = "green",
+                               "South America" = "green",
+                               "Asia" = "green",
+                               "Europe" = "green"))
+  labs(title = "Average Growth of High Income Countries by Continent",
+       x = "Continent",
+       y = "Average GDP per capita Growth")
+
+
+
