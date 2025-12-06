@@ -389,7 +389,7 @@ ggplot(Avg_Growth_All_H_by_Continent,
                                "Oceania" = "green",
                                "South America" = "green",
                                "Asia" = "green",
-                               "Europe" = "green"))
+                               "Europe" = "green")) +
   labs(title = "Average Growth of High Income Countries by Continent",
        x = "Continent",
        y = "Average GDP per capita Growth")
