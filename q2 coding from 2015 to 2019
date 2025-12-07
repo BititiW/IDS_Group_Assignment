@@ -1,0 +1,59 @@
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(ggthemes)
+#library packages needed
+
+data <- read.csv("youth-not-in-education-employment-training.csv")
+country <- read.csv("continents-according-to-our-world-in-data.csv")
+
+data1 <- data %>% left_join(country,join_by(Code))
+#join two datasets together
+data1 <- data1 %>% select(-Entity.y,-Year.y)
+#remove extra columns
+
+data1 <- data1 %>%
+  mutate(Year.x = as.numeric(Year.x))
+
+result <- data1 %>% # Ensure Year.x is numeric and filter only relevant years 
+  mutate(Year.x = as.numeric(Year.x)) %>% 
+  filter(Year.x %in% c(2014, 2015, 2019, 2020)) %>% 
+  group_by(Entity.x) %>% summarise(
+    Continent = first(Continent),
+    baseline_year = ifelse(any(Year.x == 2015), 2015, 2014), 
+    # Get baseline: 2015 if exists, else 2014 
+    baseline_rate = Share.of.youth.not.in.education..employment.or.training..total....of.youth.population.[Year.x == baseline_year], 
+    # End: prefer 2020, else 2021 
+    end_year = ifelse(any(Year.x == 2019), 2019, 2020), 
+    end_rate = Share.of.youth.not.in.education..employment.or.training..total....of.youth.population.[Year.x == end_year], 
+    rate_decreased = baseline_rate - end_rate,.groups = "drop" )
+
+# List of all six continents
+all_continents <- data.frame(
+  Continent = c("Africa", "Asia", "Europe", "North America", "South America", "Oceania"),
+  stringsAsFactors = FALSE
+)
+
+continent_counts <- result %>%
+  filter(rate_decreased > 3) %>%
+  group_by(Continent) %>%
+  summarise(n_countries = n(),.groups = "drop")
+
+# Ensure all six continents are present, add row with n_countries = 0 if missing
+continent_counts <- all_continents %>%
+  left_join(continent_counts, by = "Continent") %>%
+  mutate(n_countries = ifelse(is.na(n_countries), 0, n_countries))
+
+plot <-ggplot(continent_counts, aes(x = Continent, y = n_countries, fill = Continent)) +
+  geom_col(show.legend = FALSE) +
+  labs(
+    title = "Number of Countries per Continent with Rate Decreased > 3 from 2015 to 2019",
+    x = "Continent",
+    y = "Number of Countries"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
+  )
+
+print(plot)
