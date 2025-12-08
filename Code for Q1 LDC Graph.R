@@ -1,0 +1,103 @@
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+
+# 0. Load data sets
+continents <- read.csv("continents-according-to-our-world-in-data.csv")
+GDP_per_capita <- read.csv("gdp-per-capita-worldbank.csv")
+Youth <- read.csv("youth-not-in-education-employment-training.csv")  # not used here, but fine to keep
+Income_group_classification <- read.csv("World Bank data csv.csv")
+
+
+# 1. Clean income classification file and merge with continents
+# Remove metadata rows and extra rows
+Income_group_classification <- Income_group_classification[-c(1:4), ]
+Income_group_classification <- Income_group_classification[!(rownames(Income_group_classification) %in% c("229":"239")), ]
+
+# Keep only code, classification, and year columns
+Income_group_classification <- Income_group_classification %>% 
+  select(X, World.Bank.Analytical.Classifications, X.20:X.38)
+
+# Join with continents by country code
+joined_data1 <- Income_group_classification %>%
+  left_join(continents,
+            join_by("X" == "Code")) %>%
+  select(-Year)
+
+# Rename year columns using first data row
+names(joined_data1)[3:21] <- as.character(joined_data1[1, 3:21])
+
+# Fix country names, drop duplicate name col, tidy column names
+joined_data1 <- joined_data1 %>% 
+  mutate(World.Bank.Analytical.Classifications = ifelse(row_number() >= 7, Entity, World.Bank.Analytical.Classifications)) %>%
+  filter(!is.na(World.Bank.Analytical.Classifications)) %>%
+  select(-Entity) %>%
+  rename(Code = X, Country = World.Bank.Analytical.Classifications)
+
+# Drop first row (label row)
+joined_data1 <- joined_data1[-1, ]
+
+
+# 2. Prepare GDP data and merge with income classifications
+# Keep only years from 2015 onwards
+GDP_per_capita <- GDP_per_capita %>% filter(Year >= 2015)
+
+# Split then keep the bottom part
+joined_data1_bottom <- joined_data1 %>% slice(6:n())
+
+# Long format: one row per country–year
+joined_data1_bottom <- joined_data1_bottom %>%
+  pivot_longer(cols = -Code & -Country & -Continent,
+               names_to = "Year")
+
+joined_data1_bottom$Year <- as.integer(joined_data1_bottom$Year)
+
+# Join to GDP per capita data
+joined_data2 <- joined_data1_bottom %>%
+  inner_join(GDP_per_capita,
+             join_by("Code", "Year")) %>%
+  select(-Entity) %>%
+  rename(
+    `Income Classification` = `value`,
+    `GDP per capita` = GDP.per.capita..PPP..constant.2017.international...
+  )
+
+
+# 3. LDC GDP growth by continent over time
+# Compute GDP growth per year for each low-income country
+low_income_growth <- joined_data2 %>%
+  filter(`Income Classification` == "L") %>%              # low-income only
+  arrange(Country, Year) %>%
+  group_by(Country, Continent) %>%
+  mutate(
+    GDP_Growth = (`GDP per capita` - lag(`GDP per capita`)) /
+      lag(`GDP per capita`) * 100             # % growth
+  ) %>%
+  ungroup()
+
+# Average growth per continent per year
+LDC_continent_avg <- low_income_growth %>%
+  group_by(Year, Continent) %>%
+  summarise(
+    Avg_Growth = mean(GDP_Growth, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Plot: one line per continent + 7% SDG target line
+ggplot(LDC_continent_avg,
+       aes(x = Year, y = Avg_Growth, colour = Continent)) +
+  geom_line(linewidth = 1.1) +
+  geom_hline(yintercept = 7,
+             linetype = "dashed",
+             colour = "black",
+             linewidth = 1.2) +
+  xlim(2016, NA) +
+  labs(
+    title = "Average GDP Growth of Low-Income Countries by Continent",
+    subtitle = "Dashed line shows SDG Target 8.1: 7% annual GDP growth for LDCs",
+    x = "Year",
+    y = "Average GDP per capita growth (%)",
+    colour = "Continent"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
