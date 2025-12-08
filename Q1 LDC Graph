@@ -41,6 +41,7 @@ joined_data1 <- joined_data1[-1, ]
 # 2. Prepare GDP data and merge with income classifications
 # Keep only years from 2006 onwards
 GDP_per_capita <- GDP_per_capita %>% filter(Year >= 2006)
+# Change to post-2015 years -> more consistemt with graphs for other question + focus on the variability of a shorter time frame
 
 # Split then keep the bottom part
 joined_data1_bottom <- joined_data1 %>% slice(6:n())
