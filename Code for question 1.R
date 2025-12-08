@@ -24,7 +24,7 @@ joined_data1 <- Income_group_classification %>%
 # Rename certain columns
 names(joined_data1)[3:21] <- as.character(joined_data1[1, 3:21])
 
-# Correct country names, remove duplicate columnn of names, and rename certain columns
+# Correct country names, remove duplicate column of names, and rename certain columns
 joined_data1 <- joined_data1 %>% 
   mutate(World.Bank.Analytical.Classifications = ifelse(row_number() >= 7, Entity, World.Bank.Analytical.Classifications)) %>%
   filter(!is.na(World.Bank.Analytical.Classifications)) %>%
@@ -35,8 +35,8 @@ joined_data1 <- joined_data1 %>%
 joined_data1 <- joined_data1[-1, ]
 
 
-# Remove rows with Years before 2006
-GDP_per_capita <- GDP_per_capita %>% filter(Year >= 2006)
+# Remove rows with Years before 2015
+GDP_per_capita <- GDP_per_capita %>% filter(Year >= 2015)
 
 # Split joined_data1 into two parts
 joined_data1_top <- joined_data1 %>% slice(1:5)        # rows before cutoff
@@ -93,6 +93,7 @@ Low_income_growth_rates <- Low_income_growth_rates %>%
 # Remove columns of GDP per capita and GDP growth for individual years
 Only_Avg_Growth <- Low_income_growth_rates %>%
   select(Code, Country, Continent, `Income Classification`, Avg_Growth) %>%
+  filter(Country != "Zambia") %>%
   distinct()
 
 
@@ -190,7 +191,7 @@ LM_growth_rates <- LM_growth_rates %>%
 # Remove columns of GDP per capita and GDP growth for individual years
 Only_Avg_Growth_LM <- LM_growth_rates %>%
   select(Code, Country, Continent, `Income Classification`, Avg_Growth_LM) %>%
-  filter(Country != "Belarus") %>%
+  filter(Country != "Belarus" & Country != "Belize" & Country != "Lebanon" & Country != "Tonga") %>%
   distinct()
 
 # Calculate average growth of all LM countries
@@ -239,7 +240,8 @@ UM_growth_rates <- UM_growth_rates %>%
 # Remove columns of GDP per capita and GDP growth for individual years
 Only_Avg_Growth_UM <- UM_growth_rates %>%
   select(Code, Country, Continent, `Income Classification`, Avg_Growth_UM) %>%
-  filter(Country != "Indonesia" & Country != "Mongolia" & Country != "Oman") %>%
+  filter(Country != "Indonesia" & Country != "Mongolia" & Country != "Oman" &
+           Country != "Angola" & Country != "Croatia" & Country != "Sri Lanka") %>%
   distinct()
 
 # Calculate average growth of all UM countries
@@ -283,6 +285,7 @@ H_growth_rates <- H_growth_rates %>%
 # Remove columns of GDP per capita and GDP growth for individual years
 Only_Avg_Growth_H <- H_growth_rates %>%
   select(Code, Country, Continent, `Income Classification`, Avg_Growth_H) %>%
+  filter(Country != "Argentina") %>%
   distinct()
 
 # Calculate average growth of all UM countries
@@ -320,7 +323,7 @@ ggplot(Avg_Growth_All_L_by_Continent,
                                "Asia" = "green")) +
   labs(title = "Average Growth of Low Income Countries by Continent",
        x = "Continent",
-       y = "Average GDP per capita Growth")
+       y = "Average percentage GDP per capita Growth")
 
 
 
@@ -335,16 +338,16 @@ ggplot(Avg_Growth_All_LM_by_Continent,
            y = Avg_Growth_All_LM_by_Continent,
            fill = Continent)) +
   geom_bar(stat = "identity") +
-  scale_fill_manual(values = c("North America" = "red",
+  scale_fill_manual(values = c("North America" = "green",
                                "Africa" = "red",
-                               "Oceania" = "red",
+                               "Oceania" = "green",
                                "World" = "navy",
-                               "South America" = "green",
+                               "South America" = "red",
                                "Asia" = "green",
-                               "Europe" = "green")) +
+                               "Europe" = "red")) +
   labs(title = "Average Growth of Low Middle Income Countries by Continent",
        x = "Continent",
-       y = "Average GDP per capita Growth")
+       y = "Average percentage GDP per capita Growth")
 
 
 
@@ -368,7 +371,7 @@ ggplot(Avg_Growth_All_UM_by_Continent,
                                "Europe" = "green")) +
   labs(title = "Average Growth of Upper Middle Income Countries by Continent",
        x = "Continent",
-       y = "Average GDP per capita Growth")
+       y = "Average percentage GDP per capita Growth")
 
 
 
@@ -392,7 +395,7 @@ ggplot(Avg_Growth_All_H_by_Continent,
                                "Europe" = "green")) +
   labs(title = "Average Growth of High Income Countries by Continent",
        x = "Continent",
-       y = "Average GDP per capita Growth")
+       y = "Average percentage GDP per capita Growth")
 
 
 
