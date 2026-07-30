@@ -19,7 +19,28 @@ Analysing whether regions meet Target 8.1: Sustain per capita economic growth in
 ### Part 2
 Analysis whether regions meet Target 8.6: By 2020, substantially reduce the proportion of youth not in employment, education or training.
 
-## General findings
+## Results
+
+### Part 1
+In conclusion, Target 8.1 has not been achieved, and is
+unlikely to meet them even by 2030 based on current
+trajectories. This is largely due to the detrimental
+effect of COVID-19 on economic growth worldwide.
+In no continent have LDCs reached sustained 7%
+GDP per capita growth, and, due to COVID-19, pre-
+existing structural gaps widened. However, we
+believe that this can be solved with policy
+intervention. Possible strategies include diversifying
+away from primary commodities, enhancing
+domestic resilience to volatility and global shocks,
+and strengthening institutions that have regulatory
+power. These strategies could all help LDCs to
+accelerate their growth. However, significant scaling
+up is required, implying more investment into said
+strategies, which would be more difficult for LDCs
+to achieve.
+
+### Part 2
 Overall, our findings have shown that most
 continents did not reduce NEET between 2015 and
 2020. Improvements where present were small or
