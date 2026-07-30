@@ -35,3 +35,6 @@ pandemic.
 
 ## Repository Contents
 Written report and code for boxplots, line graphs, heat maps and bar graphs key used in analysis.
+
+## My Contributions
+Cleaned, visualised and analysed data for Part 1, producing box plots, line graphs, heat maps and bar charts using R (see Section 2.3 for full analysis)
